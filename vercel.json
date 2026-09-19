@@ -1,1 +1,8 @@
- { “rewrites”: [ { “source”: “/”, “destination”: “/轩轩专属.html” ] }
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/轩轩专属.html"
+    }
+  ]
+}
