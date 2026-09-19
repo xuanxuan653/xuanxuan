@@ -6,18 +6,22 @@ const ai = new GoogleGenAI({
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    return res.status(405).json({
+      error: "Method not allowed"
+    });
   }
 
   try {
     const { message } = req.body || {};
 
     if (typeof message !== "string" || !message.trim()) {
-      return res.status(400).json({ error: "请输入消息" });
+      return res.status(400).json({
+        error: "请输入消息"
+      });
     }
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.8-flash",
+      model: "gemini-3.6-flash",
       contents: message.trim(),
       config: {
         systemInstruction:
@@ -28,10 +32,12 @@ module.exports = async (req, res) => {
     return res.status(200).json({
       reply: response.text || "汪～"
     });
+
   } catch (error) {
     console.error(error);
+
     return res.status(500).json({
-      error: "Gemini 请求失败，请检查服务器端 API 配置。"
+      error: "Gemini 请求失败，请稍后再试。"
     });
   }
 };
