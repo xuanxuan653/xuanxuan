@@ -1,1450 +1,739 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>轩轩专属 · GPT小狗</title>
 
 <style>
-*{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif;
-  background:linear-gradient(180deg,#fff8fb,#f7f5ff);
-  color:#352f38;
-  min-height:100vh;
+* {
+  box-sizing: border-box;
 }
 
-.wrap{
-  max-width:760px;
-  margin:0 auto;
-  padding:20px 14px 40px;
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+  background: #f7f1e8;
+  color: #4a382d;
 }
 
-.card{
-  background:rgba(255,255,255,.94);
-  border:1px solid #eee5ef;
-  border-radius:28px;
-  padding:20px;
-  box-shadow:0 12px 40px rgba(70,45,80,.08);
+.app {
+  width: min(900px, 94%);
+  margin: 0 auto;
+  padding: 18px 0 35px;
 }
 
-h1{
-  text-align:center;
-  margin:0 0 6px;
-  font-size:27px;
-}
-
-.sub{
-  text-align:center;
-  color:#8b8190;
-  margin-bottom:18px;
+h1 {
+  text-align: center;
+  margin: 5px 0 18px;
+  font-size: 25px;
 }
 
 /* =========================
    小狗房间
 ========================= */
 
-.room{
-  position:relative;
-  height:430px;
-  overflow:hidden;
-  border-radius:24px;
-  background:linear-gradient(
-    180deg,
-    #fff8fb 0%,
-    #f8f4ff 62%,
-    #f1e9df 62%,
-    #eadfd1 100%
-  );
-  border:1px solid #eee4ed;
+.room {
+  position: relative;
+  height: 390px;
+  overflow: hidden;
+  border-radius: 28px;
+  background: linear-gradient(#dff3ff 0 62%, #ead7bd 62%);
+  box-shadow: 0 10px 30px rgba(70, 50, 30, .12);
 }
 
-.window{
-  position:absolute;
-  top:30px;
-  left:30px;
-  width:110px;
-  height:90px;
-  border-radius:18px;
-  background:#dff2ff;
-  border:7px solid #fff;
-  box-shadow:0 5px 12px rgba(0,0,0,.05);
+.window {
+  position: absolute;
+  top: 28px;
+  left: 28px;
+  width: 120px;
+  height: 100px;
+  border: 8px solid white;
+  border-radius: 15px;
+  background: #9edcff;
+  box-shadow: 0 5px 12px rgba(0,0,0,.08);
 }
 
-.sun{
-  position:absolute;
-  right:18px;
-  top:12px;
-  font-size:34px;
+.window::before,
+.window::after {
+  content: "";
+  position: absolute;
+  background: white;
 }
 
-.rug{
-  position:absolute;
-  width:300px;
-  height:130px;
-  left:50%;
-  bottom:35px;
-  transform:translateX(-50%);
-  background:#f6edf4;
-  border-radius:50%;
-  border:1px solid #eadde9;
+.window::before {
+  width: 6px;
+  height: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.window::after {
+  width: 100%;
+  height: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.rug {
+  position: absolute;
+  width: 270px;
+  height: 100px;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: #f4dfc4;
+}
+
+.bowl {
+  position: absolute;
+  bottom: 58px;
+  left: 45px;
+  font-size: 42px;
+}
+
+.ball {
+  position: absolute;
+  right: 65px;
+  bottom: 65px;
+  font-size: 40px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform .2s;
+}
+
+.ball:active {
+  transform: scale(.85);
 }
 
 /* =========================
    小狗
 ========================= */
 
-.dog-area{
-  position:absolute;
-  left:50%;
-  top:52%;
-  width:150px;
-  height:150px;
-  transform:translate(-50%,-50%);
+.dog {
+  position: absolute;
+  left: 50%;
+  top: 53%;
+  transform: translate(-50%, -50%);
+  font-size: 105px;
+  cursor: pointer;
+  user-select: none;
+  z-index: 5;
   transition:
-    left 1s ease,
-    top 1s ease,
-    transform .25s ease;
-  z-index:5;
+    left .65s ease,
+    top .65s ease,
+    transform .18s ease;
+  animation: breathe 2.2s ease-in-out infinite;
 }
 
-.dog{
-  width:150px;
-  height:150px;
-  border:0;
-  background:transparent;
-  font-size:105px;
-  cursor:pointer;
-  user-select:none;
-  -webkit-tap-highlight-color:transparent;
-  transition:.2s;
+.dog:active {
+  transform: translate(-50%, -50%) scale(.92);
 }
 
-.dog:active{
-  transform:scale(.9);
+@keyframes breathe {
+  0%,100% {
+    margin-top: 0;
+  }
+  50% {
+    margin-top: 4px;
+  }
 }
 
-.dog.idle{
-  animation:breathe 2.4s ease-in-out infinite;
+.dog.happy {
+  animation: happy .65s ease;
 }
 
-.dog.happy{
-  animation:happy .7s ease;
+@keyframes happy {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  35% { transform: translate(-50%, -50%) scale(1.13) rotate(-5deg); }
+  70% { transform: translate(-50%, -50%) scale(1.1) rotate(5deg); }
+  100% { transform: translate(-50%, -50%) scale(1); }
 }
 
-.dog.wag{
-  animation:wag .9s ease-in-out 2;
+.dog.pet {
+  animation: pet .75s ease;
 }
 
-.dog.eat{
-  animation:eat .7s ease-in-out 3;
+@keyframes pet {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  30% { transform: translate(-50%, -50%) scale(1.08) rotate(-3deg); }
+  55% { transform: translate(-50%, -50%) scale(.97) rotate(3deg); }
+  100% { transform: translate(-50%, -50%) scale(1); }
 }
 
-.dog.sleep{
-  animation:sleep 2.5s ease-in-out infinite;
-  filter:saturate(.65);
+.dog.eat {
+  animation: eat .9s ease;
 }
 
-.dog.play{
-  animation:play .65s ease-in-out 3;
+@keyframes eat {
+  0%,100% {
+    transform: translate(-50%, -50%) rotate(0);
+  }
+  25% {
+    transform: translate(-50%, -47%) rotate(-5deg);
+  }
+  50% {
+    transform: translate(-50%, -53%) rotate(5deg);
+  }
+  75% {
+    transform: translate(-50%, -47%) rotate(-4deg);
+  }
 }
 
-@keyframes breathe{
-  0%,100%{transform:translateY(0)}
-  50%{transform:translateY(-5px)}
+.dog.play {
+  animation: play .8s ease;
 }
 
-@keyframes happy{
-  0%{transform:translateY(0)}
-  35%{transform:translateY(-30px) rotate(-7deg)}
-  70%{transform:translateY(-8px) rotate(7deg)}
-  100%{transform:translateY(0)}
-}
-
-@keyframes wag{
-  0%,100%{transform:rotate(0)}
-  25%{transform:rotate(-7deg)}
-  50%{transform:rotate(7deg)}
-  75%{transform:rotate(-5deg)}
-}
-
-@keyframes eat{
-  0%,100%{transform:translateY(0)}
-  50%{transform:translateY(14px) scale(.96)}
-}
-
-@keyframes sleep{
-  0%,100%{transform:translateY(0)}
-  50%{transform:translateY(5px) rotate(-2deg)}
-}
-
-@keyframes play{
-  0%,100%{transform:translateY(0) rotate(0)}
-  30%{transform:translateY(-18px) rotate(-6deg)}
-  60%{transform:translateY(0) rotate(6deg)}
+@keyframes play {
+  0% {
+    transform: translate(-50%, -50%) rotate(0);
+  }
+  25% {
+    transform: translate(-50%, -50%) rotate(-10deg) scale(1.05);
+  }
+  50% {
+    transform: translate(-50%, -50%) rotate(10deg) scale(1.08);
+  }
+  75% {
+    transform: translate(-50%, -50%) rotate(-7deg) scale(1.04);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(0) scale(1);
+  }
 }
 
 /* =========================
-   房间物品
+   气泡
 ========================= */
 
-.room-item{
-  position:absolute;
-  z-index:7;
-  width:72px;
-  height:72px;
-  border:0;
-  border-radius:20px;
-  background:rgba(255,255,255,.88);
-  box-shadow:0 5px 16px rgba(60,40,70,.08);
-  font-size:37px;
-  cursor:pointer;
-  transition:.2s;
+.bubble {
+  position: absolute;
+  left: 50%;
+  top: 18%;
+  transform: translateX(-50%);
+  max-width: 75%;
+  padding: 10px 17px;
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 5px 18px rgba(0,0,0,.1);
+  font-size: 15px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s, top .25s;
+  z-index: 10;
 }
 
-.room-item:active{
-  transform:scale(.88);
-}
-
-.food{
-  left:22px;
-  bottom:25px;
-}
-
-.toy{
-  right:22px;
-  bottom:25px;
-}
-
-.bed{
-  right:20px;
-  top:25px;
-}
-
-.water{
-  left:24px;
-  bottom:125px;
-}
-
-.ball{
-  left:50%;
-  bottom:22px;
-  transform:translateX(-50%);
-}
-
-.ball:active{
-  transform:translateX(-50%) scale(.88);
+.bubble.show {
+  opacity: 1;
+  top: 13%;
 }
 
 /* =========================
-   对话气泡
+   操作区
 ========================= */
 
-.bubble{
-  position:absolute;
-  z-index:10;
-  left:50%;
-  top:18px;
-  transform:translateX(-50%);
-  max-width:78%;
-  padding:10px 15px;
-  border-radius:17px;
-  background:white;
-  border:1px solid #eee4ef;
-  box-shadow:0 5px 18px rgba(60,40,70,.07);
-  text-align:center;
-  color:#5d5362;
-  font-size:14px;
+.actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 15px;
+}
+
+button {
+  border: 0;
+  padding: 12px 8px;
+  border-radius: 15px;
+  background: white;
+  color: #4a382d;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+}
+
+button:active {
+  transform: scale(.96);
+}
+
+.status {
+  text-align: center;
+  min-height: 24px;
+  margin: 13px 0;
+  color: #806653;
 }
 
 /* =========================
-   状态
+   GPT 聊天
 ========================= */
 
-.status{
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  flex-wrap:wrap;
-  margin:12px 0;
-  color:#766879;
-  font-size:14px;
+.chat {
+  margin-top: 20px;
+  background: white;
+  border-radius: 22px;
+  padding: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,.08);
 }
 
-.status span{
-  background:#f5eff7;
-  border-radius:12px;
-  padding:6px 10px;
+.chat-title {
+  font-weight: 700;
+  margin-bottom: 10px;
 }
 
-/* =========================
-   快捷操作
-========================= */
-
-.actions{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
+.messages {
+  height: 230px;
+  overflow-y: auto;
+  padding: 8px;
+  background: #faf8f5;
+  border-radius: 15px;
 }
 
-.actions button{
-  border:0;
-  border-radius:15px;
-  padding:12px 6px;
-  font-size:15px;
-  background:#f4edf7;
-  color:#403747;
-  cursor:pointer;
+.message {
+  margin: 8px 0;
+  padding: 9px 12px;
+  border-radius: 13px;
+  max-width: 85%;
+  line-height: 1.5;
+  white-space: pre-wrap;
 }
 
-.actions button:active{
-  transform:scale(.96);
+.user {
+  margin-left: auto;
+  background: #e5f2ff;
 }
 
-/* =========================
-   聊天
-========================= */
-
-.chat{
-  margin-top:20px;
+.assistant {
+  background: #f0e8df;
 }
 
-.messages{
-  height:300px;
-  overflow:auto;
-  background:#faf8fb;
-  border:1px solid #eee8f0;
-  border-radius:18px;
-  padding:14px;
+.chat-input {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
 }
 
-.msg{
-  max-width:86%;
-  padding:10px 13px;
-  border-radius:16px;
-  margin:8px 0;
-  line-height:1.5;
-  white-space:pre-wrap;
+.chat-input input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid #ddd;
+  border-radius: 13px;
+  padding: 11px;
+  font-size: 15px;
+  outline: none;
 }
 
-.dogmsg{
-  background:#f0e9f5;
+.chat-input button {
+  width: 52px;
+  padding: 0;
 }
 
-.usermsg{
-  background:#e9f1ff;
-  margin-left:auto;
-}
-
-.composer{
-  display:flex;
-  gap:9px;
-  margin-top:10px;
-}
-
-.composer textarea{
-  flex:1;
-  resize:none;
-  min-height:48px;
-  border:1px solid #ddd4df;
-  border-radius:15px;
-  padding:12px;
-  font:inherit;
-  outline:none;
-}
-
-.send{
-  border:0;
-  border-radius:15px;
-  padding:0 18px;
-  background:#5f4b69;
-  color:white;
-  font-size:16px;
-  cursor:pointer;
-}
-
-.voice{
-  margin-top:10px;
-  width:100%;
-  border:1px solid #ded4e2;
-  background:white;
-  border-radius:15px;
-  padding:12px;
-  cursor:pointer;
-}
-
-.note{
-  font-size:12px;
-  color:#8a818d;
-  text-align:center;
-  margin-top:16px;
-  line-height:1.5;
-}
-
-@media(max-width:520px){
-  .wrap{
-    padding:12px 10px 28px;
-  }
-
-  .card{
-    padding:14px;
-    border-radius:22px;
-  }
-
-  .room{
-    height:410px;
-  }
-
-  .actions{
-    grid-template-columns:repeat(3,1fr);
-  }
-
-  .actions button{
-    font-size:14px;
-  }
-
-  .messages{
-    height:280px;
-  }
+.voice {
+  margin-top: 8px;
+  width: 100%;
 }
 </style>
 </head>
 
 <body>
 
-<div class="wrap">
-<div class="card">
+<div class="app">
 
-<h1>轩轩专属 · GPT小狗</h1>
-<div class="sub">可以直接点击房间里的东西和小狗互动</div>
+  <h1>🐶 轩轩专属 · GPT小狗</h1>
 
-<!-- =========================
-     小狗房间
-========================= -->
+  <div class="room">
 
-<div class="room" id="room">
+    <div class="window"></div>
+    <div class="rug"></div>
 
-  <div class="window"></div>
-  <div class="sun">☀️</div>
-  <div class="rug"></div>
+    <div class="bowl">🥣</div>
 
-  <div id="bubble" class="bubble">
-    汪～点一下我试试看！
-  </div>
+    <div
+      class="ball"
+      id="ball"
+      onclick="playBall()"
+      title="点击玩球"
+    >🎾</div>
 
-  <div id="dogArea" class="dog-area">
-    <button
+    <div
+      class="dog"
       id="dog"
-      class="dog idle"
-      type="button"
-      aria-label="点击小狗"
-    >
-      🐶
-    </button>
+      onclick="clickDog()"
+      title="点击小狗"
+    >🐶</div>
+
+    <div class="bubble" id="bubble"></div>
+
   </div>
 
-  <button
-    id="food"
-    class="room-item food"
-    type="button"
-    aria-label="狗狗零食"
-  >🍖</button>
+  <div class="status" id="status">
+    小狗正在看着你
+  </div>
 
-  <button
-    id="toy"
-    class="room-item toy"
-    type="button"
-    aria-label="玩具"
-  >🧸</button>
+  <div class="actions">
+    <button onclick="petDog()">👋 摸摸头</button>
+    <button onclick="feedDog()">🍖 喂小狗</button>
+    <button onclick="playBall()">🎾 玩球</button>
+    <button onclick="callDog()">🐶 呼唤</button>
+  </div>
 
-  <button
-    id="bed"
-    class="room-item bed"
-    type="button"
-    aria-label="狗窝"
-  >🛏️</button>
 
-  <button
-    id="water"
-    class="room-item water"
-    type="button"
-    aria-label="水碗"
-  >🥣</button>
+  <!-- GPT 聊天 -->
+  <div class="chat">
 
-  <button
-    id="ball"
-    class="room-item ball"
-    type="button"
-    aria-label="球"
-  >⚽</button>
-
-</div>
-
-<!-- 状态 -->
-
-<div class="status">
-  <span id="mood">心情：开心</span>
-  <span id="love">亲密度：0</span>
-  <span id="energy">精力：100</span>
-</div>
-
-<!-- 快捷互动 -->
-
-<div class="actions">
-
-  <button id="pet">
-    摸摸头
-  </button>
-
-  <button id="call">
-    叫它过来
-  </button>
-
-  <button id="hug">
-    抱一下
-  </button>
-
-  <button id="play">
-    陪它玩
-  </button>
-
-  <button id="dance">
-    让它跳舞
-  </button>
-
-  <button id="sleep">
-    哄它睡觉
-  </button>
-
-</div>
-
-<!-- =========================
-     GPT聊天
-========================= -->
-
-<div class="chat">
-
-  <div
-    id="messages"
-    class="messages"
-    aria-live="polite"
-  >
-    <div class="msg dogmsg">
-      汪～你想和我聊什么呀？
+    <div class="chat-title">
+      💬 和GPT小狗聊天
     </div>
-  </div>
 
-  <div class="composer">
+    <div
+      class="messages"
+      id="messages"
+    ></div>
 
-    <textarea
-      id="input"
-      placeholder="输入你想说的话……"
-      rows="1"
-    ></textarea>
+    <div class="chat-input">
+
+      <input
+        id="chatInput"
+        type="text"
+        placeholder="和小狗说点什么……"
+        onkeydown="if(event.key==='Enter') sendMessage()"
+      >
+
+      <button onclick="sendMessage()">
+        ➤
+      </button>
+
+    </div>
 
     <button
-      id="send"
-      class="send"
+      class="voice"
+      onclick="startVoice()"
+      id="voiceButton"
     >
-      发送
+      🎤 语音输入
     </button>
 
   </div>
 
-  <button id="voice" class="voice">
-    🎙️ 语音功能
-  </button>
-
-</div>
-
-<div class="note">
-  网页中的 API 密钥不会放在前端；真正的 GPT 请求由服务器端接口处理。
-</div>
-
-</div>
 </div>
 
 
 <script>
 
 /* =========================
-   基础元素
+   小狗互动
 ========================= */
 
-const dog =
-  document.getElementById('dog');
+const dog = document.getElementById("dog");
+const bubble = document.getElementById("bubble");
+const statusText = document.getElementById("status");
 
-const dogArea =
-  document.getElementById('dogArea');
-
-const bubble =
-  document.getElementById('bubble');
-
-const mood =
-  document.getElementById('mood');
-
-const love =
-  document.getElementById('love');
-
-const energy =
-  document.getElementById('energy');
-
-const messages =
-  document.getElementById('messages');
-
-const input =
-  document.getElementById('input');
+let bubbleTimer = null;
 
 
-/* =========================
-   小狗状态
-========================= */
-
-let affection = 0;
-let dogEnergy = 100;
-
-
-/* =========================
-   更新状态
-========================= */
-
-function updateStats(
-  newMood,
-  loveGain = 0,
-  energyChange = 0
-){
-
-  affection = Math.min(
-    100,
-    Math.max(0, affection + loveGain)
-  );
-
-  dogEnergy = Math.min(
-    100,
-    Math.max(0, dogEnergy + energyChange)
-  );
-
-  mood.textContent =
-    '心情：' + newMood;
-
-  love.textContent =
-    '亲密度：' + affection;
-
-  energy.textContent =
-    '精力：' + dogEnergy;
-}
-
-
-/* =========================
-   小狗说话
-========================= */
-
-function say(
-  text,
-  newMood = '开心',
-  loveGain = 0,
-  energyChange = 0
-){
+function say(text) {
 
   bubble.textContent = text;
 
-  updateStats(
-    newMood,
-    loveGain,
-    energyChange
-  );
+  bubble.classList.remove("show");
+
+  clearTimeout(bubbleTimer);
+
+  setTimeout(() => {
+    bubble.classList.add("show");
+  }, 20);
+
+  bubbleTimer = setTimeout(() => {
+    bubble.classList.remove("show");
+  }, 2600);
 }
 
 
-/* =========================
-   小狗动画
-========================= */
-
-function animateDog(
-  animation,
-  duration = 1000
-){
+function animateDog(className) {
 
   dog.classList.remove(
-    'idle',
-    'happy',
-    'wag',
-    'eat',
-    'sleep',
-    'play'
+    "happy",
+    "pet",
+    "eat",
+    "play"
   );
 
   void dog.offsetWidth;
 
-  dog.classList.add(animation);
+  dog.classList.add(className);
+
+  setTimeout(() => {
+    dog.classList.remove(className);
+  }, 1000);
+}
+
+
+/* 直接点击小狗 */
+
+function clickDog() {
+
+  animateDog("happy");
+
+  statusText.textContent =
+    "小狗开心地看着你";
+
+  const replies = [
+    "汪！你终于来啦～",
+    "汪汪！摸我嘛！",
+    "嘿嘿，被你发现啦。",
+    "我在这里～",
+    "汪！"
+  ];
+
+  say(
+    replies[
+      Math.floor(Math.random() * replies.length)
+    ]
+  );
+}
+
+
+/* 摸摸头 */
+
+function petDog() {
+
+  animateDog("pet");
+
+  statusText.textContent =
+    "你轻轻摸了摸小狗的头";
+
+  say("好舒服呀……再摸一下嘛。");
+}
+
+
+/* 喂小狗 */
+
+function feedDog() {
+
+  animateDog("eat");
+
+  statusText.textContent =
+    "小狗正在吃东西";
+
+  say("谢谢你喂我！好好吃～");
+}
+
+
+/* 玩球 */
+
+function playBall() {
+
+  statusText.textContent =
+    "小狗跑过去玩球了";
+
+  say("球球！我要玩！");
+
+  const oldLeft = dog.style.left;
+  const oldTop = dog.style.top;
+
+  dog.style.left = "78%";
+  dog.style.top = "66%";
+
+  animateDog("play");
 
   setTimeout(() => {
 
-    dog.classList.remove(animation);
-    dog.classList.add('idle');
+    animateDog("play");
 
-  }, duration);
+    statusText.textContent =
+      "小狗开心地把球叼回来了";
+
+    say("汪！再来一次！");
+
+    setTimeout(() => {
+
+      dog.style.left =
+        oldLeft || "50%";
+
+      dog.style.top =
+        oldTop || "53%";
+
+    }, 700);
+
+  }, 1000);
+}
+
+
+/* 呼唤 */
+
+function callDog() {
+
+  statusText.textContent =
+    "你在呼唤小狗……";
+
+  say("汪！我听到啦！");
+
+  animateDog("happy");
 }
 
 
 /* =========================
-   小狗移动
+   GPT 聊天
 ========================= */
 
-function moveDog(
-  left,
-  top,
-  callback
-){
+const messages = document.getElementById("messages");
+const input = document.getElementById("chatInput");
 
-  dogArea.style.left = left;
-  dogArea.style.top = top;
 
-  setTimeout(() => {
+function addMessage(text, type) {
 
-    if(callback){
-      callback();
-    }
+  const div =
+    document.createElement("div");
 
-  }, 950);
-}
+  div.className =
+    "message " + type;
 
+  div.textContent = text;
 
-/* =========================
-   点击小狗
-========================= */
-
-dog.addEventListener(
-  'click',
-  () => {
-
-    const reactions = [
-
-      '汪！你点我啦！',
-
-      '嘿嘿，我看到你了。',
-
-      '小狗开心地摇尾巴。',
-
-      '汪汪！要和我玩吗？',
-
-      '摸摸头～',
-
-      '我就在这里等你呀。'
-
-    ];
-
-    const random =
-      reactions[
-        Math.floor(
-          Math.random() *
-          reactions.length
-        )
-      ];
-
-    animateDog('happy',700);
-
-    say(
-      random,
-      '开心',
-      2,
-      0
-    );
-
-  }
-);
-
-
-/* =========================
-   摸摸头
-========================= */
-
-document
-.getElementById('pet')
-.addEventListener(
-  'click',
-  () => {
-
-    animateDog(
-      'wag',
-      1700
-    );
-
-    say(
-      '舒服！小狗的尾巴一直在摇。',
-      '超级开心',
-      4,
-      0
-    );
-
-  }
-);
-
-
-/* =========================
-   抱一下
-========================= */
-
-document
-.getElementById('hug')
-.addEventListener(
-  'click',
-  () => {
-
-    animateDog(
-      'happy',
-      800
-    );
-
-    say(
-      '小狗靠过来蹭了蹭你。',
-      '安心',
-      5,
-      -2
-    );
-
-  }
-);
-
-
-/* =========================
-   叫它过来
-========================= */
-
-document
-.getElementById('call')
-.addEventListener(
-  'click',
-  () => {
-
-    say(
-      '小狗听见你叫它了！',
-      '兴奋',
-      1,
-      0
-    );
-
-    moveDog(
-      '50%',
-      '52%',
-      () => {
-
-        animateDog(
-          'happy',
-          700
-        );
-
-        say(
-          '汪！我跑过来了！',
-          '兴奋',
-          3,
-          -5
-        );
-
-      }
-    );
-
-  }
-);
-
-
-/* =========================
-   喂食
-========================= */
-
-document
-.getElementById('food')
-.addEventListener(
-  'click',
-  () => {
-
-    say(
-      '小狗闻到香味，马上跑过去了！',
-      '期待',
-      1,
-      0
-    );
-
-    moveDog(
-      '15%',
-      '62%',
-      () => {
-
-        animateDog(
-          'eat',
-          2200
-        );
-
-        say(
-          '汪呜！零食真好吃！',
-          '满足',
-          6,
-          10
-        );
-
-      }
-    );
-
-  }
-);
-
-
-/* =========================
-   玩具
-========================= */
-
-document
-.getElementById('toy')
-.addEventListener(
-  'click',
-  () => {
-
-    say(
-      '小狗发现玩具了！',
-      '兴奋',
-      1,
-      0
-    );
-
-    moveDog(
-      '84%',
-      '62%',
-      () => {
-
-        animateDog(
-          'play',
-          2100
-        );
-
-        say(
-          '抓到了！陪我一起玩嘛！',
-          '超级兴奋',
-          5,
-          -12
-        );
-
-      }
-    );
-
-  }
-);
-
-
-/* =========================
-   水
-========================= */
-
-document
-.getElementById('water')
-.addEventListener(
-  'click',
-  () => {
-
-    say(
-      '小狗跑去喝水了。',
-      '舒服',
-      2,
-      5
-    );
-
-    moveDog(
-      '17%',
-      '45%',
-      () => {
-
-        animateDog(
-          'eat',
-          1600
-        );
-
-        say(
-          '咕噜咕噜……喝饱啦！',
-          '舒服',
-          2,
-          8
-        );
-
-      }
-    );
-
-  }
-);
-
-
-/* =========================
-   狗窝
-========================= */
-
-document
-.getElementById('bed')
-.addEventListener(
-  'click',
-  () => {
-
-    say(
-      '小狗慢慢走向自己的小窝。',
-      '困困的',
-      1,
-      0
-    );
-
-    moveDog(
-      '83%',
-      '30%',
-      () => {
-
-        animateDog(
-          'sleep',
-          4000
-        );
-
-        say(
-          '呼……小狗睡着啦。',
-          '困困的',
-          2,
-          5
-        );
-
-      }
-    );
-
-  }
-);
-
-
-/* =========================
-   球
-========================= */
-
-document
-.getElementById('ball')
-.addEventListener(
-  'click',
-  () => {
-
-    say(
-      '你把球丢出去了！',
-      '兴奋',
-      1,
-      0
-    );
-
-    moveDog(
-      '48%',
-      '65%',
-      () => {
-
-        animateDog(
-          'play',
-          1700
-        );
-
-        say(
-          '汪！我抓到球啦！',
-          '超级兴奋',
-          5,
-          -15
-        );
-
-      }
-    );
-
-  }
-);
-
-
-/* =========================
-   陪它玩
-========================= */
-
-document
-.getElementById('play')
-.addEventListener(
-  'click',
-  () => {
-
-    animateDog(
-      'play',
-      2200
-    );
-
-    say(
-      '小狗在房间里开心地蹦来蹦去！',
-      '超级兴奋',
-      5,
-      -18
-    );
-
-  }
-);
-
-
-/* =========================
-   跳舞
-========================= */
-
-document
-.getElementById('dance')
-.addEventListener(
-  'click',
-  () => {
-
-    animateDog(
-      'happy',
-      1500
-    );
-
-    say(
-      '汪汪！小狗开始跳舞了！',
-      '兴奋',
-      3,
-      -8
-    );
-
-  }
-);
-
-
-/* =========================
-   睡觉
-========================= */
-
-document
-.getElementById('sleep')
-.addEventListener(
-  'click',
-  () => {
-
-    animateDog(
-      'sleep',
-      5000
-    );
-
-    say(
-      '晚安……小狗趴下来睡觉了。',
-      '困困的',
-      2,
-      5
-    );
-
-  }
-);
-
-
-/* =========================
-   小狗自动眨眼
-========================= */
-
-setInterval(
-  () => {
-
-    if(
-      !dog.classList.contains('sleep')
-    ){
-
-      dog.style.transform =
-        'scaleY(.88)';
-
-      setTimeout(
-        () => {
-          dog.style.transform = '';
-        },
-        130
-      );
-
-    }
-
-  },
-  4200
-);
-
-
-/* =========================
-   小狗偶尔自己说话
-========================= */
-
-setInterval(
-  () => {
-
-    if(
-      Math.random() < .35 &&
-      !dog.classList.contains('sleep')
-    ){
-
-      const texts = [
-
-        '汪～你还在吗？',
-
-        '小狗正在看着你。',
-
-        '要不要陪我玩？',
-
-        '我有点想吃零食了……',
-
-        '汪！今天也要陪我玩。'
-
-      ];
-
-      say(
-        texts[
-          Math.floor(
-            Math.random() *
-            texts.length
-          )
-        ],
-        '开心',
-        0,
-        0
-      );
-
-    }
-
-  },
-  9000
-);
-
-
-/* =========================
-   GPT聊天
-========================= */
-
-function add(
-  text,
-  who
-){
-
-  const d =
-    document.createElement('div');
-
-  d.className =
-    'msg ' +
-    (
-      who === 'user'
-      ? 'usermsg'
-      : 'dogmsg'
-    );
-
-  d.textContent = text;
-
-  messages.appendChild(d);
+  messages.appendChild(div);
 
   messages.scrollTop =
     messages.scrollHeight;
 }
 
 
-async function send(){
+async function sendMessage() {
 
   const text =
     input.value.trim();
 
-  if(!text){
-    return;
-  }
+  if (!text) return;
 
-  add(
-    text,
-    'user'
-  );
+  addMessage(text, "user");
 
-  input.value = '';
+  input.value = "";
 
-  const sendButton =
-    document.getElementById('send');
+  try {
 
-  sendButton.disabled = true;
+    const response =
+      await fetch("/api/chat", {
 
-  add(
-    '正在想……',
-    'dog'
-  );
+        method: "POST",
 
-  const loading =
-    messages.lastElementChild;
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
 
-  try{
+        body: JSON.stringify({
+          message: text
+        })
 
-    const r =
-      await fetch(
-        '/api/chat',
-        {
-          method:'POST',
-          headers:{
-            'Content-Type':
-              'application/json'
-          },
-          body:
-            JSON.stringify({
-              message:text
-            })
-        }
-      );
+      });
+
+
+    if (!response.ok) {
+      throw new Error("请求失败");
+    }
+
 
     const data =
-      await r.json();
+      await response.json();
 
-    loading.remove();
 
-    if(!r.ok){
-
-      throw new Error(
-        data.error ||
-        '请求失败'
-      );
-
-    }
-
-    add(
+    const reply =
       data.reply ||
-      '汪……我暂时没有想到怎么回答。',
-      'dog'
+      data.message ||
+      data.content ||
+      "汪……我不知道怎么回答。";
+
+
+    addMessage(
+      reply,
+      "assistant"
     );
 
-    animateDog(
-      'happy',
-      700
+    say(reply);
+
+  } catch (error) {
+
+    console.error(error);
+
+    addMessage(
+      "暂时连接不到GPT，请检查你的后端/API设置。",
+      "assistant"
     );
 
-    say(
-      '汪！我听到你说的话啦。',
-      '开心',
-      1,
-      0
-    );
-
-  }catch(e){
-
-    loading.remove();
-
-    add(
-      '暂时连接不到 GPT：' +
-      e.message,
-      'dog'
-    );
-
-  }finally{
-
-    sendButton.disabled = false;
-
-    input.focus();
-
+    say("唔……GPT好像暂时连不上。");
   }
-
 }
-
-
-document
-.getElementById('send')
-.addEventListener(
-  'click',
-  send
-);
-
-
-input.addEventListener(
-  'keydown',
-  e => {
-
-    if(
-      e.key === 'Enter' &&
-      !e.shiftKey
-    ){
-
-      e.preventDefault();
-
-      send();
-
-    }
-
-  }
-);
 
 
 /* =========================
    语音输入
 ========================= */
 
-document
-.getElementById('voice')
-.addEventListener(
-  'click',
-  () => {
+function startVoice() {
 
-    if(
-      !(
-        'SpeechRecognition'
-        in window ||
-        'webkitSpeechRecognition'
-        in window
-      )
-    ){
+  const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
 
-      say(
-        '这个浏览器暂时不支持语音输入。',
-        '平静',
-        0,
-        0
-      );
+  if (!SpeechRecognition) {
 
-      return;
-    }
-
-    const R =
-      window.SpeechRecognition ||
-      window.webkitSpeechRecognition;
-
-    const recognition =
-      new R();
-
-    recognition.lang =
-      'zh-CN';
-
-    recognition.interimResults =
-      false;
-
-    recognition.maxAlternatives =
-      1;
-
-    say(
-      '我在听，你说吧。',
-      '认真',
-      0,
-      0
+    alert(
+      "你的浏览器暂不支持语音识别。可以尝试使用 Safari 或 Chrome。"
     );
 
-    recognition.start();
-
-    recognition.onresult =
-      e => {
-
-        input.value =
-          e.results[0][0].transcript;
-
-        say(
-          '听到了，点发送就可以啦。',
-          '开心',
-          1,
-          0
-        );
-
-      };
-
-    recognition.onerror =
-      () => {
-
-        say(
-          '没有听清，再试一次吧。',
-          '平静',
-          0,
-          0
-        );
-
-      };
-
+    return;
   }
-);
+
+
+  const recognition =
+    new SpeechRecognition();
+
+  recognition.lang = "zh-CN";
+
+  recognition.interimResults = false;
+
+  recognition.continuous = false;
+
+
+  const voiceButton =
+    document.getElementById("voiceButton");
+
+
+  voiceButton.textContent =
+    "🎙️ 正在听……";
+
+
+  recognition.start();
+
+
+  recognition.onresult =
+    function(event) {
+
+      const text =
+        event.results[0][0].transcript;
+
+      input.value = text;
+
+      sendMessage();
+    };
+
+
+  recognition.onerror =
+    function() {
+
+      voiceButton.textContent =
+        "🎤 语音输入";
+
+    };
+
+
+  recognition.onend =
+    function() {
+
+      voiceButton.textContent =
+        "🎤 语音输入";
+
+    };
+
+}
 
 </script>
 
