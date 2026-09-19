@@ -1,0 +1,8 @@
+{
+  "name": "xuanxuan-gpt-dog",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "openai": "^5.0.0"
+  }
+}

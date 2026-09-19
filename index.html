@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>轩轩专属 · GPT小狗</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif;background:linear-gradient(180deg,#fff8fb,#f7f5ff);color:#352f38;min-height:100vh}
+.wrap{max-width:760px;margin:0 auto;padding:28px 18px 40px}.card{background:rgba(255,255,255,.9);border:1px solid #eee5ef;border-radius:28px;padding:24px;box-shadow:0 12px 40px rgba(70,45,80,.08)}
+h1{text-align:center;margin:0 0 6px;font-size:28px}.sub{text-align:center;color:#8b8190;margin-bottom:22px}
+.dogbox{text-align:center;padding:18px 0}.dog{font-size:96px;display:inline-block;transition:.2s;filter:drop-shadow(0 8px 8px rgba(0,0,0,.08))}
+.dog.pet{transform:translateY(-8px) rotate(-4deg) scale(1.05)}.dog.feed{transform:scale(1.08)}
+.status{text-align:center;min-height:28px;color:#766879;margin:4px 0 20px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.actions button{border:0;border-radius:16px;padding:14px 10px;font-size:16px;background:#f4edf7;color:#403747;cursor:pointer}.actions button:hover{filter:brightness(.98)}
+.chat{margin-top:22px}.messages{height:330px;overflow:auto;background:#faf8fb;border:1px solid #eee8f0;border-radius:18px;padding:14px}
+.msg{max-width:86%;padding:10px 13px;border-radius:16px;margin:8px 0;line-height:1.5;white-space:pre-wrap}.dogmsg{background:#f0e9f5}.usermsg{background:#e9f1ff;margin-left:auto}
+.composer{display:flex;gap:9px;margin-top:10px}.composer textarea{flex:1;resize:none;min-height:48px;border:1px solid #ddd4df;border-radius:15px;padding:12px;font:inherit;outline:none}.send{border:0;border-radius:15px;padding:0 18px;background:#5f4b69;color:white;font-size:16px;cursor:pointer}
+.voice{margin-top:10px;width:100%;border:1px solid #ded4e2;background:white;border-radius:15px;padding:12px;cursor:pointer}
+.note{font-size:12px;color:#8a818d;text-align:center;margin-top:16px;line-height:1.5}
+@media(max-width:520px){.wrap{padding:15px 12px 28px}.card{padding:18px;border-radius:22px}.actions{grid-template-columns:1fr 1fr}.messages{height:300px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card">
+<h1>轩轩专属 · GPT小狗</h1>
+<div class="sub">你的专属小狗已经准备好了</div>
+<div class="dogbox"><div id="dog" class="dog" aria-label="小狗">🐶</div></div>
+<div id="status" class="status">汪～我在这里等你。</div>
+<div class="actions">
+<button id="pet">摸摸头</button><button id="feed">喂小狗</button>
+</div>
+<div class="chat">
+<div id="messages" class="messages" aria-live="polite"><div class="msg dogmsg">汪～你想和我聊什么呀？</div></div>
+<div class="composer"><textarea id="input" placeholder="输入你想说的话……" rows="1"></textarea><button id="send" class="send">发送</button></div>
+<button id="voice" class="voice">🎙️ 语音功能（需要浏览器支持）</button>
+</div>
+<div class="note">网页中的 API 密钥不会放在前端；真正的 GPT 请求由服务器端接口处理。</div>
+</div>
+</div>
+<script>
+const dog=document.getElementById('dog'),status=document.getElementById('status'),messages=document.getElementById('messages'),input=document.getElementById('input');
+function dogAction(cls,text){dog.classList.remove('pet','feed');void dog.offsetWidth;dog.classList.add(cls);status.textContent=text;setTimeout(()=>dog.classList.remove(cls),500)}
+document.getElementById('pet').onclick=()=>dogAction('pet','汪～摸到了！再摸一下嘛。');
+document.getElementById('feed').onclick=()=>dogAction('feed','汪呜！谢谢你喂我。');
+function add(text,who){const d=document.createElement('div');d.className='msg '+(who==='user'?'usermsg':'dogmsg');d.textContent=text;messages.appendChild(d);messages.scrollTop=messages.scrollHeight}
+async function send(){
+ const text=input.value.trim(); if(!text)return;
+ add(text,'user'); input.value=''; document.getElementById('send').disabled=true;
+ add('正在想……','dog'); const loading=messages.lastElementChild;
+ try{
+   const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});
+   const data=await r.json();
+   loading.remove();
+   if(!r.ok) throw new Error(data.error||'请求失败');
+   add(data.reply||'汪……我暂时没有想到怎么回答。','dog');
+ }catch(e){loading.remove();add('暂时连接不到 GPT：'+e.message,'dog')}
+ finally{document.getElementById('send').disabled=false;input.focus()}
+}
+document.getElementById('send').onclick=send;
+input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
+document.getElementById('voice').onclick=()=>{
+ if(!('SpeechRecognition'in window||'webkitSpeechRecognition'in window)){status.textContent='这个浏览器暂时不支持语音输入。';return}
+ const R=window.SpeechRecognition||window.webkitSpeechRecognition,r=new R();r.lang='zh-CN';r.interimResults=false;r.maxAlternatives=1;
+ status.textContent='请开始说话……';r.start();r.onresult=e=>{input.value=e.results[0][0].transcript;status.textContent='听到了，点发送即可。'};r.onerror=()=>status.textContent='语音输入没有成功，请再试一次。'
+};
+</script>
+</body>
+</html>
